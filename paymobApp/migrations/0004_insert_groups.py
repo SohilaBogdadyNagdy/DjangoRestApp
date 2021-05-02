@@ -24,8 +24,8 @@ class Migration(migrations.Migration):
 
        # adminGroup = Group('admin', [addProductPermission])
        # adminGroup.save()
-        normalGroup = Group('normal', [payProductPermission])
-        normalGroup.save()
+       # normalGroup = Group('normal', [payProductPermission])
+       # normalGroup.save()
 
     operations = [
         migrations.RunPython(makeGroupsPermissions,reverse_code=lambda *args,**kwargs: True)
