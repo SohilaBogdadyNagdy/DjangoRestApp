@@ -11,7 +11,7 @@ from paymobApp.api.serializers import UserSerializer, GroupSerializer, ProductSe
 from paymobApp.api.models import Product, UserProfile
 from django.contrib.auth.models import User
 from paymobApp.api.permissions import is_in_group, HasGroupPermission
-from paymobApp.api.utils import currencyConverter
+from paymobApp.api.utils import currencyConverter, getRatesFromBaseCurrency
 
 @method_decorator(ratelimit(key='ip', method=ratelimit.ALL, rate='5/m'), name='dispatch')
 class UserViewSet(viewsets.ModelViewSet):
@@ -63,11 +63,13 @@ class ProductDetailsViewSet(viewsets.ModelViewSet):
     def list(self, request, *arg, **kwargs):
         profile = UserProfile.objects.filter(user=self.request.user).first()
         userCurrency = profile.currency or 'USD'
+        allRates = getRatesFromBaseCurrency(userCurrency)
         queryset = Product.objects.all()
         serializer = self.get_serializer(queryset, many=True)
         data = serializer.data
         for record in data:
-            record.price = currencyConverter(record['price'], record['currency'], userCurrency)
+            record['price'] = allRates.get(record['currency']) * record['price'] if allRates.get(record['currency']) else record['price']
+            record['currency'] = userCurrency if allRates.get(record['currency']) else record['currency']
         return Response(data)
 
     def perform_create(self, serializer):
