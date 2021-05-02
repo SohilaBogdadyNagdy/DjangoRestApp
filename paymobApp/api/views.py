@@ -7,7 +7,7 @@ from ratelimit.decorators import ratelimit
 from django.utils.decorators import method_decorator
 
 from paymobApp.api.serializers import UserSerializer, GroupSerializer, ProductSerializer
-from paymobApp.api.models import Product
+from paymobApp.api.models import Product, UserProfile
 from django.contrib.auth.models import User
 from paymobApp.api.permissions import is_in_group, HasGroupPermission
 
@@ -57,6 +57,19 @@ class ProductDetailsViewSet(viewsets.ModelViewSet):
     }
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
+
+    def list(self, request, *arg, **kwargs):
+        profile = UserProfile.objects.filter(user=self.request.user).first()
+        userCurrency = profile.currency or 'USD'
+        queryset = Product.objects.all()       
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
+
     def perform_create(self, serializer):
         serializer.save(createdBy=self.request.user)
 
