@@ -1,5 +1,3 @@
-import os
-import requests
 
 from django.contrib.auth.models import Group
 from django.db.models import Sum
@@ -13,6 +11,7 @@ from paymobApp.api.serializers import UserSerializer, GroupSerializer, ProductSe
 from paymobApp.api.models import Product, UserProfile
 from django.contrib.auth.models import User
 from paymobApp.api.permissions import is_in_group, HasGroupPermission
+from paymobApp.api.utils import currencyConverter
 
 @method_decorator(ratelimit(key='ip', method=ratelimit.ALL, rate='5/m'), name='dispatch')
 class UserViewSet(viewsets.ModelViewSet):
@@ -60,14 +59,6 @@ class ProductDetailsViewSet(viewsets.ModelViewSet):
     }
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
-
-    def currencyConverter(self, amount, fromCurrency, toCurrency):
-        print("currencyConverter---------")
-        url = os.environ['FIXER_URL'] + '?access_key=' + os.environ['FIXER_API_KEY'] 
-        url += "&from=" + fromCurrency + "&to=" + toCurrency + "&amount=" + amount
-        response = requests.get(url)
-        print(response)
-        return response.json()
 
     def list(self, request, *arg, **kwargs):
         profile = UserProfile.objects.filter(user=self.request.user).first()
