@@ -1,3 +1,6 @@
+import os
+import requests
+
 from django.contrib.auth.models import Group
 from django.db.models import Sum
 from rest_framework import viewsets
@@ -58,6 +61,14 @@ class ProductDetailsViewSet(viewsets.ModelViewSet):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
 
+    def currencyConverter(self, amount, fromCurrency, toCurrency):
+        print("currencyConverter---------")
+        url = os.environ['FIXER_URL'] + '?access_key=' + os.environ['FIXER_API_KEY'] 
+        url += "&from=" + fromCurrency + "&to=" + toCurrency + "&amount=" + amount
+        response = requests.get(url)
+        print(response)
+        return response.json()
+
     def list(self, request, *arg, **kwargs):
         profile = UserProfile.objects.filter(user=self.request.user).first()
         userCurrency = profile.currency or 'USD'
@@ -68,7 +79,11 @@ class ProductDetailsViewSet(viewsets.ModelViewSet):
             return self.get_paginated_response(serializer.data)
 
         serializer = self.get_serializer(queryset, many=True)
-        return Response(serializer.data)
+        data = serializer.data
+        print('inside listtttt', data)
+        for record in data:
+            record.price = self.currencyConverter(record.price, record.currency, userCurrency)
+        return Response(data)
 
     def perform_create(self, serializer):
         serializer.save(createdBy=self.request.user)
