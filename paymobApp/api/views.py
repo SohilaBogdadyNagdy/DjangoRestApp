@@ -1,4 +1,4 @@
-from django.contrib.auth.models import User, Group
+from django.contrib.auth.models import Group
 from django.db.models import Sum
 from rest_framework import viewsets
 from django.shortcuts import get_object_or_404
@@ -6,13 +6,14 @@ from rest_framework.response import Response
 
 from paymobApp.api.serializers import UserSerializer, GroupSerializer, ProductSerializer
 from paymobApp.api.models import Product
+from django.contrib.auth.models import User
 from paymobApp.api.permissions import is_in_group, HasGroupPermission
 
 class UserViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows users to be viewed or edited.
     """
-    queryset = User.objects.all().order_by('-date_joined')
+    queryset = User.objects.all()
     serializer_class = UserSerializer
 
 
@@ -36,6 +37,9 @@ class ProductViewSet(viewsets.ModelViewSet):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
 
+    def perform_create(self, serializer):
+        serializer.save(createdBy=self.request.user)
+
 class ProductDetailsViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows to view product details
@@ -48,7 +52,8 @@ class ProductDetailsViewSet(viewsets.ModelViewSet):
     }
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
-
+    def perform_create(self, serializer):
+        serializer.save(createdBy=self.request.user)
 class ProductPurchaseViewSet(viewsets.ViewSet):
     """
     API endpoint that allow to normal users to purchase a product

@@ -1,7 +1,9 @@
-from django.contrib.auth.models import User, Group
+from django.contrib.auth.models import Group
 from rest_framework import serializers
 
-from .models import Product
+from paymobApp.api.models import Product
+from django.contrib.auth.models import User
+
 
 class UserSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
@@ -12,9 +14,9 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
 class GroupSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Group
-        fields = ['url', 'name']
+        fields = ['url', 'name', 'permissions']
 
 class ProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
-        fields = '__all__'
+        fields = ['name', 'price', 'currency']
