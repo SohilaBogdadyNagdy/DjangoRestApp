@@ -63,17 +63,11 @@ class ProductDetailsViewSet(viewsets.ModelViewSet):
     def list(self, request, *arg, **kwargs):
         profile = UserProfile.objects.filter(user=self.request.user).first()
         userCurrency = profile.currency or 'USD'
-        queryset = Product.objects.all()       
-        page = self.paginate_queryset(queryset)
-        if page is not None:
-            serializer = self.get_serializer(page, many=True)
-            return self.get_paginated_response(serializer.data)
-
+        queryset = Product.objects.all()
         serializer = self.get_serializer(queryset, many=True)
         data = serializer.data
-        print('inside listtttt', data)
         for record in data:
-            record.price = self.currencyConverter(record.price, record.currency, userCurrency)
+            record.price = currencyConverter(record['price'], record['currency'], userCurrency)
         return Response(data)
 
     def perform_create(self, serializer):
