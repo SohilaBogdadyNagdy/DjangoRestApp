@@ -53,6 +53,11 @@ class ProductPurchaseViewSet(viewsets.ViewSet):
     """
     API endpoint that allow to normal users to purchase a product
     """
+    permission_classes = [HasGroupPermission]
+    required_groups = {
+        'GET': ['__all__'],
+        'PATCH': ['normal'],
+    }
     def list(self, request):
         user = request.user
         queryset = Product.objects.filter(purchasedBy=user)
@@ -85,7 +90,10 @@ class ProductsTotalRevenue(viewsets.ViewSet):
     """
     API endpoint that allow admin user to get total revenue
     """
-
+    permission_classes = [HasGroupPermission]
+    required_groups = {
+        'GET': ['admin'],
+    }
     def list(self, request):
         user = request.user
         total = Product.objects.filter(isPaid=True).aggregate(Sum('price'))
