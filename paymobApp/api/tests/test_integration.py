@@ -5,7 +5,7 @@ from base64 import b64encode
 from django.test import TestCase
 from rest_framework.test import APIClient, APITestCase
 from django.contrib.auth.models import User, Group
-from .models import Product
+from paymobApp.api.models import Product
 
 
 class ProductTests(APITestCase):
