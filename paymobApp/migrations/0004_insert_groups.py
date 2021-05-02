@@ -22,10 +22,20 @@ class Migration(migrations.Migration):
         payProductPermission.save()
         addProductPermission.save()
 
-       # adminGroup = Group('admin', [addProductPermission])
-       # adminGroup.save()
-       # normalGroup = Group('normal', [payProductPermission])
-       # normalGroup.save()
+        adminGroup = Group.objects.create(name='admin')
+        normalGroup = Group.objects.create(name='normal')
+        adminGroup.permissions.add(addProductPermission)
+        normalGroup.permissions.add(payProductPermission)
+
+        adminUser = User.objects.create(username='admin')
+        adminUser.groups.add(adminGroup)
+        normalUser = User.objects.create(username='normal')
+        normalUser.groups.add(normalGroup)
+        adminUser.set_password('TEST!@#$')
+        adminUser.save()
+        normalUser.set_password('TEST!@#$')
+        normalUser.save()
+
 
     operations = [
         migrations.RunPython(makeGroupsPermissions,reverse_code=lambda *args,**kwargs: True)

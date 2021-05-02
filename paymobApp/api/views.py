@@ -6,6 +6,7 @@ from rest_framework.response import Response
 
 from paymobApp.api.serializers import UserSerializer, GroupSerializer, ProductSerializer
 from paymobApp.api.models import Product
+from paymobApp.api.permissions import is_in_group, HasGroupPermission
 
 class UserViewSet(viewsets.ModelViewSet):
     """
@@ -26,6 +27,12 @@ class ProductViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows products to be viewed or edited.
     """
+    permission_classes = [HasGroupPermission]
+    required_groups = {
+        'GET': ['__all__'],
+        'POST': ['admin'],
+        'PUT': ['admin'],
+    }
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
 
@@ -33,6 +40,12 @@ class ProductDetailsViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows to view product details
     """
+    permission_classes = [HasGroupPermission]
+    required_groups = {
+        'GET': ['__all__'],
+        'POST': ['admin'],
+        'PUT': ['admin'],
+    }
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
 
