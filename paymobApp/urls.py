@@ -23,7 +23,7 @@ router.register(r'users', views.UserViewSet)
 router.register(r'groups', views.GroupViewSet)
 router.register(r'products', views.ProductDetailsViewSet)
 router.register(r'purchase', views.ProductPurchaseViewSet, 'purchaseProduct')
-
+router.register(r'total_revenue', views.ProductsTotalRevenue, 'Get_total_revenue')
 # Setup automatic URL routing
 # Additionally, we include login URLs for the browsable API.
 urlpatterns = [

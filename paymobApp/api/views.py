@@ -1,4 +1,5 @@
 from django.contrib.auth.models import User, Group
+from django.db.models import Sum
 from rest_framework import viewsets
 from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
@@ -66,4 +67,15 @@ class ProductPurchaseViewSet(viewsets.ViewSet):
         return Response({
             'message': 'successs',
         })
+
+class ProductsTotalRevenue(viewsets.ViewSet):
+    """
+    API endpoint that allow admin user to get total revenue
+    """
+
+    def list(self, request):
+        user = request.user
+        total = Product.objects.filter(isPaid=True).aggregate(Sum('price'))
+        return Response(total)
+
 
