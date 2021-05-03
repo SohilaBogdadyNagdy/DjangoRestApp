@@ -62,7 +62,7 @@ class ProductDetailsViewSet(viewsets.ModelViewSet):
 
     def list(self, request, *arg, **kwargs):
         profile = UserProfile.objects.filter(user=self.request.user).first()
-        userCurrency = profile.currency or 'USD'
+        userCurrency = profile['currency'] if profile else 'USD'
         allRates = getRatesFromBaseCurrency(userCurrency)
         queryset = Product.objects.all()
         serializer = self.get_serializer(queryset, many=True)

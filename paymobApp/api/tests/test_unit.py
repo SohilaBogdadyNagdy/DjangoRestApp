@@ -3,7 +3,7 @@ from paymobApp.api.models import Product
 from django.contrib.auth.models import User, Group
 class ProductTestCase(TestCase):
     def setUp(self):
-        user = User.objects.create(username='admin', password='admin')
+        user = User.objects.get_or_create(username='admin')[0]
         Product.objects.create(name="p1", price=10, createdBy=user)
         Product.objects.create(name="p2", price=20, createdBy=user)
 
@@ -14,5 +14,6 @@ class ProductTestCase(TestCase):
     
     def test_motify_product(self):
         product = Product.objects.filter(id=1)
-        product.update(price=30)
-        self.assertEqual(Product.objects.filter(id=1).price, 30)
+        product.update(price=30, currency="USD")
+        updatedProduct = Product.objects.filter(id=1).first()
+        self.assertEqual(updatedProduct.price, 30)
