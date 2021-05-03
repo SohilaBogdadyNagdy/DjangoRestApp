@@ -38,7 +38,6 @@ class ProductTests(APITestCase):
         response = self.client.post(url, data, headers= self.headers, format='json')
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(Product.objects.count(), 2)
-
     def test_List_products(self):
         """
         Ensure both admins and normal users can list products object.
