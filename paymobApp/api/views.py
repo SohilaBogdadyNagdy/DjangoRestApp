@@ -1,18 +1,20 @@
 
+from dotenv import load_dotenv
+from rest_framework.response import Response
+from ratelimit.decorators import ratelimit
+from django.utils.decorators import method_decorator
 from django.contrib.auth.models import Group
 from django.db.models import Sum
 from rest_framework import viewsets
 from django.shortcuts import get_object_or_404
-from rest_framework.response import Response
-from ratelimit.decorators import ratelimit
-from django.utils.decorators import method_decorator
 
+from paymobApp.api.utils import currencyConverter, getRatesFromBaseCurrency
 from paymobApp.api.serializers import UserSerializer, GroupSerializer, ProductSerializer
 from paymobApp.api.models import Product, UserProfile
 from django.contrib.auth.models import User
 from paymobApp.api.permissions import is_in_group, HasGroupPermission
-from paymobApp.api.utils import currencyConverter, getRatesFromBaseCurrency
 
+load_dotenv()  
 @method_decorator(ratelimit(key='ip', method=ratelimit.ALL, rate='5/m'), name='dispatch')
 class UserViewSet(viewsets.ModelViewSet):
     """
@@ -63,7 +65,7 @@ class ProductDetailsViewSet(viewsets.ModelViewSet):
     def list(self, request, *arg, **kwargs):
         profile = UserProfile.objects.filter(user=self.request.user).first()
         print(UserProfile)
-        userCurrency = profile.currency if profile else 'USD'
+        userCurrency = profile.currency if profile else os.environ.get('DEFAULT_CURRENCY')
         allRates = getRatesFromBaseCurrency(userCurrency)
         queryset = Product.objects.all()
         serializer = self.get_serializer(queryset, many=True)
